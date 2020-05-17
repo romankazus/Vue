@@ -20,27 +20,31 @@
 
       <section class="menu">
         <h2>Menu</h2>
-        <div class="menu-item">
+        <div class="menu-item" v-for="item in simpleMenu">
           <img
             class="menu-item__image"
-            src="https://via.placeholder.com/300x150"
-            alt=""
+            :src="item.image.source"
+            :alt="item.image.alt"
           />
           <div>
-            <h3>Item Name</h3>
-            <p>In Stock</p>
-            <p>Out of Stock</p>
+            <h3>{{ item.name }}</h3>
+            <p v-if="item.inStock">In Stock</p>
+            <p v-else>Out of Stock</p>
             <div>
-              <label for="add-item-quantity">Quantity:</label>
-              <input id="add-item-quantity" type="number" />
-              <button>Add to Shopping Cart</button>
+              <label :for="'add-item-quantity-' + item.name">Quantity:</label>
+              <input :id="'add-item-quantity-' + item.name" type="number"/>
+              <!--<button @click="addToShoppingCart(item.name, 2)">Add to Shopping Cart</button>
+              -->
+              <button @click="addToShoppingCart(item.name, this.document.getElementById('add-item-quantity-' + item.name).value)">Add to Shopping Cart</button> 
             </div>
           </div>
         </div>
       </section>
 
       <aside class="shopping-cart">
-        <h2>Shopping Cart: 0 items</h2>
+        <br><br><br><br><br><br><br><br>
+        <h2>Shopping Cart: {{ totalNumberItemsShoppingCart }} items</h2>
+        <p v-for="item in simpleMenu">Number {{ item.name }} = {{ item.quantityInShoppingCart }}</p>
       </aside>
 
       <h2>Contact Us</h2>
@@ -55,7 +59,7 @@
       </ul>
 
       <footer class="footer">
-        <p>Copyright {{ restaurantName }} 2019</p>
+        <p>{{ copyright }}</p>
       </footer>
     </div>
 
@@ -76,7 +80,8 @@
                 alt: 'A crossiant'
               },
               inStock: true,
-              quantity: 1
+              quantity: 1,
+              quantityInShoppingCart: 0
             },
             {
               name: 'French Baguette',
@@ -85,7 +90,8 @@
                 alt: 'Four French Baguettes'
               },
               inStock: true,
-              quantity: 1
+              quantity: 1,
+              quantityInShoppingCart: 0
             },
             {
               name: 'Éclair',
@@ -94,7 +100,8 @@
                 alt: 'Chocolate Éclair'
               },
               inStock: false,
-              quantity: 1
+              quantity: 1,
+              quantityInShoppingCart: 0
             }
           ]
         },
@@ -103,8 +110,37 @@
             const currentYear = new Date().getFullYear()
 
             return `Copyright ${this.restaurantName} ${currentYear}`
+          },
+          totalNumberItemsShoppingCart() {
+            var total = 0
+            const menu = this.simpleMenu
+            for(i in menu) {
+              total += menu[i].quantityInShoppingCart
+            }
+            return total
           }
+        },
+        methods: {
+          addToShoppingCart(name, qty) {
+            qty = parseInt(qty)
+            var menu = this.simpleMenu
+            if(isNaN(qty)) {
+              return
+            }
+            for(i in menu) {
+              item = menu[i]
+              if(item.name == name) {
+                this.simpleMenu[i].quantityInShoppingCart += qty
+              }
+            }
+
+          }
+
+          
+
         }
+
+        
       })
     </script>
   </body>
